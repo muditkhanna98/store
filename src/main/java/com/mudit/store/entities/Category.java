@@ -1,32 +1,29 @@
 package com.mudit.store.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "tags")
+@Table(name = "categories")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-public class Tag {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Byte id;
 
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(mappedBy = "tags")
-    @ToString.Exclude
-    private Set<User> users = new HashSet<>();
-
-    public Tag(String name) {
-        this.name = name;
-    }
+    @OneToMany(mappedBy = "category")
+    private Set<Product> products = new HashSet<>();
 }
