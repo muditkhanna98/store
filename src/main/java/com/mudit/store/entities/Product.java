@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -29,5 +31,7 @@ public class Product {
     @Column(name = "description")
     private String description;
 
+    @ManyToMany(mappedBy = "wishlist")
+    private Set<User> users = new HashSet<>();
 
 }

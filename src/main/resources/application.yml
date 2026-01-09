@@ -9,18 +9,3 @@ spring:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
-
-logging:
-  level:
-    org.flywaydb: DEBUG
-    org.springframework.jdbc: DEBUG
-    com.zaxxer.hikari: DEBUG
-stripe:
-  apiUrl: https://api.stripe.com
-  timeout: 1000
-  enabled: true
-  supported-currencies: USD,EUR,GBP
-payment-gateway: paypal
-mail:
-  host: https://smtp.gmail.com
-  port: 5761
