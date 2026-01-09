@@ -1,19 +1,15 @@
 package com.mudit.store.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "products")
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +25,9 @@ public class Product {
     @ManyToOne()
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @Column(name = "description")
+    private String description;
+
+
 }

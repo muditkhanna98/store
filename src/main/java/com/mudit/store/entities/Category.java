@@ -1,24 +1,20 @@
 package com.mudit.store.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "categories")
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
+@Table(name = "categories")
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Byte id;
 
     @Column(name = "name")
@@ -26,4 +22,6 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     private Set<Product> products = new HashSet<>();
+
+
 }
