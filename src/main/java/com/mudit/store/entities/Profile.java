@@ -5,16 +5,16 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "profiles")
-@Getter
-@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@ToString
+@Getter
+@Setter
+@Entity
+@Table(name = "profiles")
 public class Profile {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
@@ -30,7 +30,7 @@ public class Profile {
     @Column(name = "loyalty_points")
     private Integer loyaltyPoints;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
     @MapsId
     private User user;

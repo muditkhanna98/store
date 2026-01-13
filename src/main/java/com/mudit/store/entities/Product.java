@@ -10,10 +10,10 @@ import java.util.Set;
 
 @Getter
 @Setter
-@Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "products")
 public class Product {
     @Id
@@ -24,17 +24,13 @@ public class Product {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "price")
     private BigDecimal price;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "category_id")
     private Category category;
-
-    @Column(name = "description")
-    private String description;
-
-    @ManyToMany(mappedBy = "wishlist")
-    private Set<User> users = new HashSet<>();
-
 }

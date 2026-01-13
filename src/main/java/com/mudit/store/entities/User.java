@@ -8,14 +8,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Entity
-@Table(name = "users")
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,41 +30,40 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @Builder.Default
     private List<Address> addresses = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "user_tags", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @Builder.Default
-    private Set<Tag> tags = new HashSet<>();
-
-    @OneToOne(mappedBy = "user")
-    private Profile profile;
-
-    @ManyToMany
-    @JoinTable(name = "wishlist",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private Set<Product> wishlist = new HashSet<>();
-
     public void addAddress(Address address) {
-        this.addresses.add(address);
+        addresses.add(address);
         address.setUser(this);
     }
 
     public void removeAddress(Address address) {
-        this.addresses.remove(address);
+        addresses.remove(address);
         address.setUser(null);
     }
 
-    public void addTag(String tag) {
-        Tag newTag = new Tag(tag);
-        this.tags.add(newTag);
-        newTag.getUsers().add(this);
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private Profile profile;
+
+    @ManyToMany
+    @JoinTable(
+            name = "wishlist",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> favoriteProducts = new HashSet<>();
+
+    public void addFavoriteProduct(Product product) {
+        favoriteProducts.add(product);
     }
 
-    public void removeTag(Tag tag) {
-        this.tags.remove(tag);
-        tag.getUsers().remove(this);
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "name = " + name + ", " +
+                "email = " + email + ")";
     }
 }
