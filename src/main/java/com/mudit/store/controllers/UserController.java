@@ -15,7 +15,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    @GetMapping("/")
+    @GetMapping
     public Iterable<UserDto> getAllUsers(@RequestParam(required = false, name = "sort") String sort) {
         return userRepository.findAll()
                 .stream()
