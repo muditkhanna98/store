@@ -1,5 +1,6 @@
 package com.mudit.store.controllers;
 
+import com.mudit.store.dtos.RegisterUserRequest;
 import com.mudit.store.dtos.UserDto;
 import com.mudit.store.entities.User;
 import com.mudit.store.mappers.UserMapper;
@@ -7,6 +8,9 @@ import com.mudit.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @AllArgsConstructor
@@ -17,10 +21,7 @@ public class UserController {
 
     @GetMapping
     public Iterable<UserDto> getAllUsers(@RequestParam(required = false, name = "sort") String sort) {
-        return userRepository.findAll()
-                .stream()
-                .map(userMapper::toDto)
-                .toList();
+        return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -31,5 +32,17 @@ public class UserController {
         }
         UserDto userDto = userMapper.toDto(user);
         return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest userRequest,
+                                              UriComponentsBuilder uriComponentsBuilder) {
+        User user = userMapper.toEntity(userRequest);
+        userRepository.save(user);
+
+        UserDto userDto = userMapper.toDto(user);
+        //Good practise to do this. It's a REST Convention to set status to 201
+        URI uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
+        return ResponseEntity.created(uri).body(userDto);
     }
 }
