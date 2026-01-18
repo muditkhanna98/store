@@ -6,12 +6,16 @@ import com.mudit.store.dtos.UserDto;
 import com.mudit.store.entities.User;
 import com.mudit.store.mappers.UserMapper;
 import com.mudit.store.repositories.UserRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -36,8 +40,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody RegisterUserRequest userRequest,
-                                              UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody RegisterUserRequest userRequest, UriComponentsBuilder uriComponentsBuilder) {
         User user = userMapper.toEntity(userRequest);
         userRepository.save(user);
 
@@ -48,8 +51,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id,
-                                              @RequestBody UpdateUserRequest userRequest) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id, @RequestBody UpdateUserRequest userRequest) {
         User user = userRepository.findById(id).orElse(null);
 
         if (user == null) {
@@ -72,5 +74,15 @@ public class UserController {
             userRepository.delete(user);
             return ResponseEntity.noContent().build();
         }
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException exception) {
+        Map<String, String> errors = new HashMap<>();
+
+        exception.getBindingResult().getFieldErrors().forEach(error -> {
+            errors.put(error.getField(), error.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errors);
     }
 }
