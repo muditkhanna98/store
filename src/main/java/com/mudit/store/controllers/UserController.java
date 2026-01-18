@@ -1,6 +1,7 @@
 package com.mudit.store.controllers;
 
 import com.mudit.store.dtos.RegisterUserRequest;
+import com.mudit.store.dtos.UpdateUserRequest;
 import com.mudit.store.dtos.UserDto;
 import com.mudit.store.entities.User;
 import com.mudit.store.mappers.UserMapper;
@@ -44,5 +45,20 @@ public class UserController {
         //Good practise to do this. It's a REST Convention to set status to 201
         URI uri = uriComponentsBuilder.path("/users/{id}").buildAndExpand(userDto.getId()).toUri();
         return ResponseEntity.created(uri).body(userDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable(name = "id") Long id,
+                                              @RequestBody UpdateUserRequest userRequest) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            userMapper.update(userRequest, user);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(userMapper.toDto(user));
+        }
     }
 }
