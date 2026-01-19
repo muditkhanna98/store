@@ -40,7 +40,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody RegisterUserRequest userRequest, UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterUserRequest userRequest, UriComponentsBuilder uriComponentsBuilder) {
+        boolean userExists = userRepository.existsByEmail(userRequest.getEmail());
+
+        if (userExists) {
+            return ResponseEntity.badRequest().body(Map.of("email", "Email already exists"));
+
+        }
+
         User user = userMapper.toEntity(userRequest);
         userRepository.save(user);
 
@@ -76,13 +83,4 @@ public class UserController {
         }
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException exception) {
-        Map<String, String> errors = new HashMap<>();
-
-        exception.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-    }
 }

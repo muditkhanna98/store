@@ -1,5 +1,6 @@
 package com.mudit.store.dtos;
 
+import com.mudit.store.validation.Lowercase;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,7 @@ public class RegisterUserRequest {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
+    @Lowercase(message = "Email must be lowercase")
     private String email;
 
     @NotBlank
