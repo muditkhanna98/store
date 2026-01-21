@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "carts", schema = "store_api")
+@Table(name = "carts")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
