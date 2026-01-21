@@ -39,7 +39,7 @@ public class CartController {
 
     @PostMapping("/{cartId}/items")
     public ResponseEntity<CartItemDto> addToCart(@PathVariable UUID cartId, @RequestBody AddItemToCartRequest request) {
-        Cart cart = cartRepository.findById(cartId).orElse(null);
+        Cart cart = cartRepository.getCartWithCartItems(cartId).orElse(null);
         if (cart == null) {
             return ResponseEntity.notFound().build();
         }
@@ -71,7 +71,7 @@ public class CartController {
 
     @GetMapping("/{cartId}")
     public ResponseEntity<CartDto> getCart(@PathVariable UUID cartId) {
-        Cart cart = cartRepository.findById(cartId).orElse(null);
+        Cart cart = cartRepository.getCartWithCartItems(cartId).orElse(null);
         if (cart == null) {
             return ResponseEntity.notFound().build();
         } else {
