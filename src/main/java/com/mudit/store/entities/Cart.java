@@ -38,4 +38,19 @@ public class Cart {
                         .getId().equals(productId))
                 .findFirst().orElse(null);
     }
+
+    public CartItem addItem(Product product) {
+        CartItem cartItem = this.getItem(product.getId());
+        if (cartItem != null) {
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        } else {
+            cartItem = new CartItem();
+            cartItem.setCart(this);
+            cartItem.setProduct(product);
+            cartItem.setQuantity(1);
+            this.cartItems.add(cartItem);
+        }
+
+        return cartItem;
+    }
 }
