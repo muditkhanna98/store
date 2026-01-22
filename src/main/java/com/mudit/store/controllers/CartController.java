@@ -3,12 +3,14 @@ package com.mudit.store.controllers;
 import com.mudit.store.dtos.AddItemToCartRequest;
 import com.mudit.store.dtos.CartDto;
 import com.mudit.store.dtos.CartItemDto;
+import com.mudit.store.dtos.UpdateCartItemRequest;
 import com.mudit.store.entities.Cart;
 import com.mudit.store.entities.CartItem;
 import com.mudit.store.entities.Product;
 import com.mudit.store.mappers.CartMapper;
 import com.mudit.store.repositories.CartRepository;
 import com.mudit.store.repositories.ProductRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,11 +51,7 @@ public class CartController {
             return ResponseEntity.badRequest().build();
         }
 
-        CartItem cartItem = cart.getCartItems()
-                .stream()
-                .filter(item -> item.getProduct()
-                        .getId().equals(product.getId()))
-                .findFirst().orElse(null);
+        CartItem cartItem = cart.getItem(product.getId());
         if (cartItem != null) {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
         } else {
@@ -77,6 +75,30 @@ public class CartController {
         } else {
             CartDto cartDto = cartMapper.toCartDto(cart);
             return ResponseEntity.ok(cartDto);
+        }
+    }
+
+
+    @PutMapping("/{cartId}/items/{productId}")
+    ResponseEntity<CartItemDto> updateItem(@PathVariable UUID cartId,
+                                           @PathVariable Long productId,
+                                           @Valid @RequestBody UpdateCartItemRequest request
+    ) {
+        Cart cart = cartRepository.getCartWithCartItems(cartId).orElse(null);
+
+        if (cart == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            CartItem cartItem = cart.getItem(productId);
+
+            if (cartItem != null) {
+                cartItem.setQuantity(request.getQuantity());
+                cartRepository.save(cart);
+                CartItemDto cartItemDto = cartMapper.toCartItemDto(cartItem);
+                return ResponseEntity.ok(cartItemDto);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
     }
 }
