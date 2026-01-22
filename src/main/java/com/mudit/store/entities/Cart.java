@@ -64,4 +64,8 @@ public class Cart {
             cartItem.setCart(null);
         }
     }
+
+    public void clear() {
+        this.cartItems.clear();
+    }
 }
