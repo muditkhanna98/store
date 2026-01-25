@@ -1,5 +1,6 @@
 package com.mudit.store.controllers;
 
+import com.mudit.store.config.JwtConfig;
 import com.mudit.store.dtos.JWTResponse;
 import com.mudit.store.dtos.UserDto;
 import com.mudit.store.dtos.UserLoginRequest;
@@ -25,6 +26,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private AuthenticationManager authenticationManager;
     private JWTService jwtService;
+    private final JwtConfig jwtConfig;
 
 
     @PostMapping("/login")
@@ -40,7 +42,7 @@ public class AuthController {
         Cookie jwtCookie = new Cookie("refreshToken", refreshToken);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/auth/refresh");
-        jwtCookie.setMaxAge(604800); //7d
+        jwtCookie.setMaxAge(jwtConfig.getRefreshTokenExpiration()); //7d
         jwtCookie.setSecure(true);
 
         response.addCookie(jwtCookie);
