@@ -6,6 +6,8 @@ import com.mudit.store.dtos.UserLoginRequest;
 import com.mudit.store.entities.User;
 import com.mudit.store.repositories.UserRepository;
 import com.mudit.store.services.JWTService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +28,24 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<JWTResponse> login(@RequestBody UserLoginRequest loginRequest) {
+    public ResponseEntity<JWTResponse> login(@RequestBody UserLoginRequest loginRequest, HttpServletResponse response) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
-        String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(new JWTResponse(token));
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+
+        //Cookie for refresh tokens
+        Cookie jwtCookie = new Cookie("refreshToken", refreshToken);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setPath("/auth/refresh");
+        jwtCookie.setMaxAge(604800); //7d
+        jwtCookie.setSecure(true);
+
+        response.addCookie(jwtCookie);
+
+        return ResponseEntity.ok(new JWTResponse(accessToken));
     }
 
     @PostMapping("/validate")
