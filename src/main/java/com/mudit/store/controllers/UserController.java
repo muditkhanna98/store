@@ -3,6 +3,7 @@ package com.mudit.store.controllers;
 import com.mudit.store.dtos.RegisterUserRequest;
 import com.mudit.store.dtos.UpdateUserRequest;
 import com.mudit.store.dtos.UserDto;
+import com.mudit.store.entities.Role;
 import com.mudit.store.entities.User;
 import com.mudit.store.mappers.UserMapper;
 import com.mudit.store.repositories.UserRepository;
@@ -52,6 +53,7 @@ public class UserController {
 
         User user = userMapper.toEntity(userRequest);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        user.setRole(Role.USER);
         userRepository.save(user);
 
         UserDto userDto = userMapper.toDto(user);

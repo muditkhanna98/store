@@ -26,21 +26,12 @@ public class JWTService {
     }
 
     private String generateToken(User user, long tokenExpiration) {
-        return Jwts
-                .builder()
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration))
-                .subject(user.getId().toString())
-                .signWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes()))
-                .claim("name", user.getName()).claim("email", user.getEmail()).compact();
+        return Jwts.builder().issuedAt(new Date()).expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration)).subject(user.getId().toString()).signWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes())).claim("name", user.getName()).claim("email", user.getEmail()).claim("role", user.getRole()).compact();
     }
 
     public boolean validateToken(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes()))
-                    .build()
-                    .parseSignedClaims(token).getPayload();
+            Claims claims = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes())).build().parseSignedClaims(token).getPayload();
 
             return claims.getExpiration().after(new Date());
         } catch (JwtException exception) {
@@ -49,10 +40,7 @@ public class JWTService {
     }
 
     public Long getUserId(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes()))
-                .build()
-                .parseSignedClaims(token).getPayload();
+        Claims claims = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes())).build().parseSignedClaims(token).getPayload();
 
         return Long.valueOf(claims.getSubject());
     }
