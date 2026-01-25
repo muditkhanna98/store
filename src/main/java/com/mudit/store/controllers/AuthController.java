@@ -24,11 +24,13 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     private JWTService jwtService;
 
+
     @PostMapping("/login")
     public ResponseEntity<JWTResponse> login(@RequestBody UserLoginRequest loginRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-        String token = jwtService.generateToken(loginRequest.getEmail());
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow();
+        String token = jwtService.generateToken(user);
         return ResponseEntity.ok(new JWTResponse(token));
     }
 
@@ -43,9 +45,9 @@ public class AuthController {
 
     public ResponseEntity<UserDto> me() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) authentication.getPrincipal();
+        Long userId = (Long) authentication.getPrincipal();
 
-        User user = userRepository.findByEmail(email).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
             return ResponseEntity.notFound().build();

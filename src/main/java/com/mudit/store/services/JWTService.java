@@ -1,5 +1,6 @@
 package com.mudit.store.services;
 
+import com.mudit.store.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,14 +15,16 @@ public class JWTService {
     @Value("${spring.jwt.secret}")
     private String secret;
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         final long tokenExpiration = 86400;
         return Jwts
                 .builder()
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * tokenExpiration))
-                .subject(email)
+                .subject(user.getId().toString())
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
+                .claim("name", user.getName())
+                .claim("email", user.getEmail())
                 .compact();
     }
 
@@ -39,13 +42,13 @@ public class JWTService {
         }
     }
 
-    public String getEmailFromToken(String token) {
+    public Long getUserId(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return claims.getSubject();
+        return Long.valueOf(claims.getSubject());
     }
 }
