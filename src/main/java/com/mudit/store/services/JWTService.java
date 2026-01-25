@@ -1,6 +1,7 @@
 package com.mudit.store.services;
 
 import com.mudit.store.config.JwtConfig;
+import com.mudit.store.entities.Role;
 import com.mudit.store.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -43,5 +44,10 @@ public class JWTService {
         Claims claims = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes())).build().parseSignedClaims(token).getPayload();
 
         return Long.valueOf(claims.getSubject());
+    }
+
+    public Role getRoleFromToken(String token) {
+        Claims claims = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes())).build().parseSignedClaims(token).getPayload();
+        return Role.valueOf(String.valueOf(claims.get("role")));
     }
 }
